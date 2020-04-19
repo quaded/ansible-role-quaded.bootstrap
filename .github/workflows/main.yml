@@ -30,9 +30,6 @@ jobs:
       run: pip3 install ansible==${{ matrix.ansible }} molecule docker
     - name: Molecule execute
       run: |
-        cd ..
-        mv ${GITHUB_WORKSPACE} testrole
-        cd testrole
         python3 -m molecule test 
       env:
         MOLECULE_DISTRO: ${{ matrix.os }}
