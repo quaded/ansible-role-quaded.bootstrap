@@ -1,0 +1,38 @@
+name: molecule test
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        os:
+          - centos7
+          - ubuntu1804
+        ansible:
+          - 2.8
+          - 2.7
+          - 2.6.*
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v1
+      with:
+        python-version: '3.7'
+        architecture: 'x64'
+    - name: Install dependencies
+      run: pip3 install ansible==${{ matrix.ansible }} molecule docker
+    - name: Molecule execute
+      run: |
+        cd ..
+        mv ${GITHUB_WORKSPACE} testrole
+        cd testrole
+        python3 -m molecule test 
+      env:
+        MOLECULE_DISTRO: ${{ matrix.os }}
