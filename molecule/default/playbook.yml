@@ -19,3 +19,4 @@
     users:
       - username: user1
       - username: user2
+    install_firewall: False
