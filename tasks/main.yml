@@ -1,0 +1,76 @@
+---
+
+- name: create system users
+  user:
+    name: "{{ item.username }}"
+    shell: /bin/bash
+    createhome: true
+  with_items: "{{ users }}"
+
+- name: set authorized key taken from file
+  authorized_key:
+    user: "{{ ansible_user }}"
+    state: present
+    key: "{{ lookup('file', authorized_key_file) }}"
+
+- name: set timezone
+  timezone:
+    name: "{{ system_timezone }}"
+
+- name: install basic applications
+  yum:
+    name: "{{ default_packages }}"
+    state: present
+  when: ansible_os_family == "RedHat"
+
+- name: install NTP via yum/dnf
+  yum:
+    name: chrony
+    state: present
+  notify: start ntp
+  when: ansible_os_family == "RedHat" and install_ntp
+
+- name: install firewalld via yum/dnf
+  yum:
+    name: firewalld
+    state: present
+  notify: start firewalld
+  when: ansible_os_family == "RedHat" and install_firewalld
+
+- name: add epel repo
+  yum:
+    name: "{{ epel_repo_url }}"
+    state: present
+  when: ansible_os_family == "RedHat" and add_epel_repo
+
+- name: add epel GPG key
+  rpm_key:
+    key: "{{ epel_repo_gpg_key_url }}"
+    state: present
+  when: ansible_os_family == "RedHat" and add_epel_repo
+
+- name: change ssh port
+  template:
+    src: "sshd_config.j2"
+    dest: "/etc/ssh/sshd_config"
+    owner: root
+    group: root
+    mode: 0600
+  notify: 
+    - restart sshd
+
+- name: allow ssh port
+  firewalld:
+    port: "{{ ssh_port }}/tcp"
+    permanent: yes
+    state: enabled
+  notify: 
+    - reload firewalld
+
+- name: change selinux ssh port
+  seport:
+    ports: "{{ ssh_port }}"
+    proto: tcp
+    setype: ssh_port_t
+    state: present
+  when: ansible_os_family == "RedHat"

@@ -1,0 +1,22 @@
+---
+
+### General settings ###
+install_ntp: True
+install_firewalld: True
+add_epel_repo: True
+ssh_port: 22
+authorized_key_file: "~/.ssh/id_rsa.pub"
+system_timezone: "UTC"
+
+### Repository settings ###
+epel_repo_url: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
+epel_repo_gpg_key_url: "/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}"
+epel_repofile_path: "/etc/yum.repos.d/epel.repo"
+
+
+default_packages:
+  - nano
+  - wget
+  - python3-policycoreutils
+  - python3-firewall
+
