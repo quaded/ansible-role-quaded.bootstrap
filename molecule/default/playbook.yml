@@ -14,4 +14,7 @@
       when: ansible_distribution == 'Fedora'
 
   roles:
-    - role: testrole
+    - role: quaded.bootstrap
+  vars:
+    - username: user1
+    - username: user2
