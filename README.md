@@ -1,4 +1,5 @@
-# Ansible Role: quaded.bootstrap
+# Ansible Role: quaded.bootstrap ![](https://github.com/quaded/ansible-role-quaded.bootstrap/workflows/molecule%20test/badge.svg)
+
 
 Auxiliary role for other quaded.* roles.
 
