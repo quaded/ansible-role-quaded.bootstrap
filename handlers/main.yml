@@ -5,10 +5,10 @@
     state: restarted
     name: sshd
 
-- name: reload firewalld
+- name: reload firewall
   systemd:
     state: reloaded
-    name: firewalld
+    name: "{{ firewall_package }}"
 
 - name: start ntp
   systemd:
@@ -16,8 +16,8 @@
     enabled: yes
     name: chronyd
 
-- name: start firewalld
+- name: start firewall
   systemd:
     state: started
     enabled: yes
-    name: firewalld
+    name: "{{ firewall_package }}"

@@ -4,17 +4,18 @@
   become: true
 
   pre_tasks:
-    - name: Update apt cache.
+    - name: update apt cache.
       apt: update_cache=true cache_valid_time=600
       when: ansible_os_family == 'Debian'
 
-    - name: Clear out repo for Fedora.
-      set_fact:
-        redis_enablerepo: ""
-      when: ansible_distribution == 'Fedora'
+    - name: instaall ssh (for molecule testing)
+      package:
+        name: openssh-server
+        state: present
 
   roles:
     - role: quaded.bootstrap
   vars:
-    - username: user1
-    - username: user2
+    users:
+      - username: user1
+      - username: user2

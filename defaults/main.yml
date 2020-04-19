@@ -2,7 +2,6 @@
 
 ### General settings ###
 install_ntp: True
-install_firewalld: True
 add_epel_repo: True
 ssh_port: 22
 authorized_key_file: "~/.ssh/id_rsa.pub"
@@ -17,5 +16,8 @@ epel_repofile_path: "/etc/yum.repos.d/epel.repo"
 default_packages:
   - nano
   - wget
-  - python3-policycoreutils
-  - python3-firewall
+  - "{% if ansible_os_family == 'RedHat' and ansible_distribution_major_version|int < 8 %}policycoreutils-python{% else %}python3-policycoreutils{% endif %}"
+  - "{% if ansible_os_family == 'RedHat' and ansible_distribution_major_version|int < 8 %}python-firewall{% else %}python3-firewall{% endif %}"
+
+install_firewall: True
+firewall_package: "{% if ansible_os_family == 'RedHat' %}firewalld{% else %}ufw{% endif %}"

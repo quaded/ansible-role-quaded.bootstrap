@@ -9,13 +9,15 @@
 
 - name: set authorized key taken from file
   authorized_key:
-    user: "{{ ansible_user }}"
+    user: "{{ ansible_ssh_user }}"
     state: present
     key: "{{ lookup('file', authorized_key_file) }}"
+  when: ansible_ssh_user is defined
 
 - name: set timezone
   timezone:
     name: "{{ system_timezone }}"
+  when: ansible_os_family == "RedHat"
 
 - name: install basic applications
   yum:
@@ -30,12 +32,12 @@
   notify: start ntp
   when: ansible_os_family == "RedHat" and install_ntp
 
-- name: install firewalld via yum/dnf
-  yum:
-    name: firewalld
+- name: install firewall
+  package:
+    name: "{{ firewall_package }}"
     state: present
-  notify: start firewalld
-  when: ansible_os_family == "RedHat" and install_firewalld
+  notify: start firewall
+  when: install_firewall
 
 - name: add epel repo
   yum:
@@ -59,13 +61,20 @@
   notify:
     - restart sshd
 
-- name: allow ssh port
+- name: allow ssh port for RedHat
   firewalld:
     port: "{{ ssh_port }}/tcp"
     permanent: yes
     state: enabled
   notify:
-    - reload firewalld
+    - reload firewall
+  when: ansible_os_family == "RedHat" and install_firewall
+
+- name: allow ssh port for Debian/ubuntu
+  ufw:
+    rule: allow
+    name: OpenSSH
+  when: ansible_os_family == "Debian" and install_firewall
 
 - name: change selinux ssh port
   seport:
@@ -73,4 +82,4 @@
     proto: tcp
     setype: ssh_port_t
     state: present
-  when: ansible_os_family == "RedHat"
+  when: ansible_os_family == "RedHat" and ansible_selinux.status == "enabled"
