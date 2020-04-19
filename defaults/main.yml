@@ -19,4 +19,3 @@ default_packages:
   - wget
   - python3-policycoreutils
   - python3-firewall
-
