@@ -14,7 +14,7 @@
   systemd:
     state: started
     enabled: yes
-    name: chrony
+    name: chronyd
 
 - name: start firewalld
   systemd:
